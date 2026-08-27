@@ -1,6 +1,7 @@
 using System.Threading;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class gameManagerScript : MonoBehaviour
 {
@@ -45,5 +46,10 @@ public class gameManagerScript : MonoBehaviour
         {
             isPlaying = false;
         }
+    }
+
+    public void ReloadLevel()
+    {
+        SceneManager.LoadScene(0);
     }
 }
