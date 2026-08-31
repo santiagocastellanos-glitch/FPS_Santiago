@@ -2,6 +2,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class Enemy : MonoBehaviour
 {
@@ -16,7 +17,9 @@ public class Enemy : MonoBehaviour
     private Transform player;
 
     [SerializeField]
-    public List<Transform> patrolPoint = new List<Transform>();
+    public List<Transform> patrolPoint = new List<Transform>(3);
+
+    int currentPoint = 0;
 
     private void Awake()
     {
@@ -26,7 +29,7 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         player = GameObject.Find("Player").transform;
-        agent.stoppingDistance = 1;
+        agent.stoppingDistance = 2;
     }
 
     // Update is called once per frame
@@ -38,7 +41,21 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            agent.destination = patrolPoint[0].position;
+            if(Vector3.Distance(transform.position, patrolPoint[currentPoint].position) >= 3)
+            {
+                agent.destination = patrolPoint[currentPoint].position;
+            }
+            else
+            {
+                if (currentPoint < patrolPoint.Count)
+                {
+                    currentPoint++;
+                }
+                else
+                {
+                    currentPoint = 0;
+                }
+            }
         }
 
         if (Vector3.Distance(transform.position, player.position) <= agent.stoppingDistance)
@@ -47,12 +64,14 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            knife.SetActive(true);
+            knife.SetActive(false);
         }
     }
     public void TakeDamage(float value)
     {
         health -= value;
+        GetComponent<MeshRenderer>().material.DOColor(Color.red, 1).From();
+        GetComponent<MeshRenderer>().material.DOColor(Color.gray, 1);
         if(health <= 0)
         {
             Destroy(this.gameObject);
